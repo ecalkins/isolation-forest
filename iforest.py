@@ -1,5 +1,5 @@
 
-# Follows algo from https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf
+# Follows algorithm from https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf
 import numpy as np
 import pandas as pd
 import math
@@ -23,11 +23,10 @@ class IsolationTreeEnsemble:
         self.max_depth = math.ceil(math.log(sample_size, 2))
         self.trees = []
 
-    def fit(self, X:np.ndarray, improved=False):
+    def fit(self, X:np.ndarray):
         """
-        Given a 2D matrix of observations, create an ensemble of IsolationTree
-        objects and store them in a list: self.trees.  Convert DataFrames to
-        ndarray objects.
+        Given a matrix of observations, build an ensemble of IsolationTrees
+        and store them in self.trees. Convert dataframe to numpy ndarray.
         """
         if isinstance(X, pd.DataFrame):
             X = X.values
@@ -41,10 +40,10 @@ class IsolationTreeEnsemble:
 
     def path_length(self, X:np.ndarray) -> np.ndarray:
         """
-        Given a 2D matrix of observations, X, compute the average path length
-        for each observation in X.  Compute the path length for x_i using every
-        tree in self.trees then compute the average for each x_i.  Return an
-        ndarray of shape (len(X),1).
+        Given a matrix of observations, X, compute the average path length
+        for each observation in X. First compute the path length for x_i using
+        every tree in self.trees and then compute the average for each x_i.
+        Return a numpy ndarray of average path lengths.
         """
         if isinstance(X, pd.DataFrame):
             X = X.values
@@ -72,8 +71,8 @@ class IsolationTreeEnsemble:
 
     def anomaly_score(self, X:np.ndarray) -> np.ndarray:
         """
-        Given a 2D matrix of observations, X, compute the anomaly score
-        for each x_i observation, returning an ndarray of them.
+        Given a matrix of observations, X, compute the anomaly score for each
+        x_i observation, returning an ndarray of them.
         """
         if self.sample_size > 2:
             c = 2*np.log(self.sample_size-1)+0.5772156649\
@@ -96,7 +95,7 @@ class IsolationTreeEnsemble:
 
 
     def predict(self, X:np.ndarray, threshold:float) -> np.ndarray:
-        "A shorthand for calling anomaly_score() and predict_from_anomaly_scores()."
+        "Easy way to call anomaly_score() and predict_from_anomaly_scores()."
         return self.predict_from_anomaly_scores(self.anomaly_score(X), threshold)
 
 
@@ -106,13 +105,10 @@ class IsolationTree:
         self.root = None
         self.n_nodes = 0
 
-    def fit(self, X:np.ndarray, height=0, improved=False):
+    def fit(self, X:np.ndarray, height=0):
         """
-        Given a 2D matrix of observations, create an isolation tree. Set field
+        Given a matrix of observations, create an isolation tree. Set field
         self.root to the root of that tree and return it.
-
-        If you are working on an improved algorithm, check parameter "improved"
-        and switch to your new functionality else fall back on your original code.
         """
         self.n_nodes += 1
         if len(X) <= 1 or height >= self.height_limit:
@@ -149,9 +145,8 @@ class IsolationTree:
 def find_TPR_threshold(y, scores, desired_TPR):
     """
     Start at score threshold 1.0 and work down until we hit desired TPR.
-    Step by 0.01 score increments. For each threshold, compute the TPR
-    and FPR to see if we've reached to the desired TPR. If so, return the
-    score threshold and FPR.
+    For each threshold, compute the TPR and FPR to see if we've reached the
+    desired TPR. If so, return the score threshold and FPR.
     """
     threshold = 1
     while True:
